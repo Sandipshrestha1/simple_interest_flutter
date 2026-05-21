@@ -1,28 +1,23 @@
 import 'package:smplintr/core/services/base_service.dart';
+import 'package:smplintr/features/simple_interest/data/datasource/simpleinterest_remote_datasource.dart';
+import 'package:smplintr/features/simple_interest/data/repositories/simple_interest_repository_impl.dart';
 
-import '../data/datasource/simpleinterest_remote_datasource.dart';
-import '../data/repositories/simple_interest_repository_impl.dart';
+import '../domain/entities/simple_interest.dart';
 
 class SimpleInterestController {
-  late final SimpleInterestRepositoryImpl repository;
+  final repository = SimpleInterestRepositoryImpl(
+    SimpleInterestDatasource(BaseService()),
+  );
 
-  SimpleInterestController() {
-    repository = SimpleInterestRepositoryImpl(
-      SimpleInterestDatasource(BaseService()),
-    );
-  }
-
-  Future<String> calculate({
+  Future<SimpleInterest> calculate({
     required double principal,
     required double rate,
     required double time,
   }) async {
-    final response = await repository.calculateInterest(
+    return await repository.calculateInterest(
       principal: principal,
       rate: rate,
       time: time,
     );
-
-    return response.interest.toString();
   }
 }

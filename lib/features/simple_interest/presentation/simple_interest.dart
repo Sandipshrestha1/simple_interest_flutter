@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smplintr/features/simple_interest/domain/entities/simple_interest.dart';
 import 'package:smplintr/features/simple_interest/presentation/simple_interest_controller.dart';
 
 class SimpleInterestPage extends StatefulWidget {
@@ -13,15 +14,13 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
   final rateController = TextEditingController();
   final timeController = TextEditingController();
 
-  String result = "";
+  SimpleInterest? result;
 
   late SimpleInterestController controller;
 
   @override
   void initState() {
     super.initState();
-
-    // ✅ ONLY controller here (Clean Architecture safe)
     controller = SimpleInterestController();
   }
 
@@ -55,6 +54,7 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Simple Interest")),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -100,10 +100,33 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
 
             const SizedBox(height: 20),
 
-            Text(
-              "Result: $result",
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
+            // ✅ FIXED DISPLAY SECTION
+            if (result == null)
+              const Text("No result yet")
+            else
+              Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Principal: ${result!.principal}"),
+                      Text("Rate: ${result!.rate}"),
+                      Text("Time: ${result!.time}"),
+                      const Divider(),
+                      Text(
+                        "Interest: ${result!.interest}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        "Total Amount: ${result!.totalAmount}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
