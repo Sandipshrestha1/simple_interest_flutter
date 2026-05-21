@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smplintr/core/constants/network/internet_checker.dart';
 import 'package:smplintr/features/simple_interest/domain/entities/simple_interest.dart';
 import 'package:smplintr/features/simple_interest/presentation/simple_interest_controller.dart';
 
@@ -14,6 +15,7 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
   final rateController = TextEditingController();
   final timeController = TextEditingController();
 
+  final InternetChecker internetChecker = InternetChecker();
   SimpleInterest? result;
 
   late SimpleInterestController controller;
@@ -25,6 +27,15 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
   }
 
   void calculateInterest() async {
+    final hasInternet = await internetChecker.hasInternet();
+
+    if (!mounted) return;
+    if (!hasInternet) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("No internet Connection")));
+    }
+
     final principal = double.tryParse(principalController.text) ?? 0;
 
     final rate = double.tryParse(rateController.text) ?? 0;
