@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smplintr/core/constants/network/internet_checker.dart';
 import 'package:smplintr/features/simple_interest/domain/entities/simple_interest.dart';
 import 'package:smplintr/features/simple_interest/presentation/simple_interest_controller.dart';
+import 'package:smplintr/features/simple_interest/presentation/widget/shimmer_effect.dart';
 
 class SimpleInterestPage extends StatefulWidget {
   const SimpleInterestPage({super.key});
@@ -18,6 +19,7 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
   final InternetChecker internetChecker = InternetChecker();
   SimpleInterest? result;
 
+  bool isLoading = false;
   late SimpleInterestController controller;
 
   @override
@@ -35,6 +37,9 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
         context,
       ).showSnackBar(const SnackBar(content: Text("No internet Connection")));
     }
+    setState(() {
+      isLoading = true;
+    });
 
     final principal = double.tryParse(principalController.text) ?? 0;
 
@@ -50,6 +55,7 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
 
     setState(() {
       result = response;
+      isLoading = false;
     });
   }
 
@@ -104,17 +110,26 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: calculateInterest,
-                child: const Text("Calculate"),
+                onPressed: isLoading ? null : calculateInterest,
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text("Calculate"),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            // ✅ FIXED DISPLAY SECTION
-            if (result == null)
-              const Text("No result yet")
-            else
+            // ✅ SHOW SHIMMER OR RESULT
+            if (isLoading)
+              buildShimmerCard(context)
+            else if (result != null)
               Card(
                 elevation: 4,
                 child: Padding(
@@ -122,7 +137,7 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Principal: ${result!.principal}"),
+                      Text("Principal: ${result?.principal ?? 0}"),
                       Text("Rate: ${result!.rate}"),
                       Text("Time: ${result!.time}"),
                       const Divider(),
