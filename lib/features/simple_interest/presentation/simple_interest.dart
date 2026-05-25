@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smplintr/core/constants/network/internet_checker.dart';
+import 'package:smplintr/core/utils/widget/loader.dart';
 import 'package:smplintr/features/simple_interest/domain/entities/simple_interest.dart';
 import 'package:smplintr/features/simple_interest/presentation/simple_interest_controller.dart';
 import 'package:smplintr/features/simple_interest/presentation/widget/shimmer_effect.dart';
@@ -20,6 +21,7 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
   SimpleInterest? result;
 
   bool isLoading = false;
+  bool noInternet = false;
   late SimpleInterestController controller;
 
   @override
@@ -33,11 +35,18 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
 
     if (!mounted) return;
     if (!hasInternet) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("No internet Connection")));
+      setState(() {
+        noInternet = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: ActionChip(label: Text("No internet Connection")),
+        ),
+      );
+      return;
     }
     setState(() {
+      noInternet = false;
       isLoading = true;
     });
 
@@ -110,17 +119,17 @@ class _SimpleInterestPageState extends State<SimpleInterestPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: noInternet ? Colors.red : null,
+                ),
                 onPressed: isLoading ? null : calculateInterest,
                 child: isLoading
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                        child: ColorChangingLoader(strokeWidth: 2.5),
                       )
-                    : const Text("Calculate"),
+                    : Text(noInternet ? "No Internet" : "Calculate"),
               ),
             ),
 
