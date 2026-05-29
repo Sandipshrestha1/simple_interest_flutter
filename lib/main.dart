@@ -1,13 +1,15 @@
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:smplintr/core/theme/app_theme.dart";
+import "package:smplintr/features/simple_interest/presentation/bloc/simple_interest_bloc.dart";
 import "package:smplintr/features/simple_interest/presentation/simple_interest.dart";
 
 void main() {
-  runApp(const SimpleInterest());
+  runApp(const SimpleInterestApp());
 }
 
-class SimpleInterest extends StatelessWidget {
-  const SimpleInterest({super.key});
+class SimpleInterestApp extends StatelessWidget {
+  const SimpleInterestApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,10 @@ class SimpleInterest extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: SimpleInterestPage(),
+      home: BlocProvider(
+        create: (context) => SimpleInterestBloc(),
+        child: SimpleInterestScreen(),
+      ),
     );
   }
 }
